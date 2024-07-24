@@ -53,7 +53,7 @@ namespace dftfe
       copyValueType1ArrToValueType2Arr(const dftfe::size_type size,
                                        const ValueType1 *     valueType1Arr,
                                        ValueType2 *           valueType2Arr,
-                                       const deviceStream_t   streamId = 0);
+                                       const deviceStream_t   streamId = sycl::queue{sycl::gpu_selector_v});
 
 
       template <typename ValueType1, typename ValueType2>
@@ -153,20 +153,20 @@ namespace dftfe
           const double *                    x,
           const double                      alpha,
           const dftfe::size_type            size,
-          dftfe::utils::deviceBlasHandle_t &deviceBlasHandle);
+          dftfe::utils::deviceStream_t d_streamId);
 
       double
       l2_norm(const double *                    x,
               const dftfe::size_type            size,
               const MPI_Comm &                  mpi_communicator,
-              dftfe::utils::deviceBlasHandle_t &deviceBlasHandle);
+              dftfe::utils::deviceStream_t d_streamId);
 
       double
       dot(const double *                    x,
           const double *                    y,
           const dftfe::size_type            size,
           const MPI_Comm &                  mpi_communicator,
-          dftfe::utils::deviceBlasHandle_t &deviceBlasHandle);
+          dftfe::utils::deviceStream_t d_streamId);
 
       template <typename ValueType>
       void

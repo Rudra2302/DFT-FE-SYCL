@@ -106,6 +106,8 @@ template parameter instead. Available typedefs LogicError - std::logic_error
 #  include <DeviceExceptions.cu.h>
 #elif DFTFE_WITH_DEVICE_LANG_HIP
 #  include <DeviceExceptions.hip.h>
+#elif DFTFE_WITH_DEVICE_LANG_SYCL
+#  include "DeviceExceptions.sycl.h"
 #endif
 
 #define MPICHECK(cmd)                                                      \
@@ -142,5 +144,5 @@ namespace dftfe
 
   } // namespace utils
 } // namespace dftfe
-#include "Exceptions.t.cc"
+#include "../utils/Exceptions.t.cc"
 #endif // dftfeExceptions_h

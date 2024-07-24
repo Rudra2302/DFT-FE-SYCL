@@ -591,7 +591,7 @@ namespace dftfe
             const unsigned int ldb,
             const float *      beta,
             float *            C,
-            const unsigned int ldc) const;
+            const unsigned int ldc);
       // Complex-Single Precision GEMM
       void
       xgemm(const char                 transA,
@@ -606,7 +606,7 @@ namespace dftfe
             const unsigned int         ldb,
             const std::complex<float> *beta,
             std::complex<float> *      C,
-            const unsigned int         ldc) const;
+            const unsigned int         ldc);
 
       // Real-double precison GEMM
       void
@@ -622,7 +622,7 @@ namespace dftfe
             const unsigned int ldb,
             const double *     beta,
             double *           C,
-            const unsigned int ldc) const;
+            const unsigned int ldc);
 
 
       // Complex-double precision GEMM
@@ -639,7 +639,7 @@ namespace dftfe
             const unsigned int          ldb,
             const std::complex<double> *beta,
             std::complex<double> *      C,
-            const unsigned int          ldc) const;
+            const unsigned int          ldc);
 
 
       void
@@ -653,7 +653,7 @@ namespace dftfe
             const unsigned int incx,
             const double *     beta,
             double *           y,
-            const unsigned int incy) const;
+            const unsigned int incy);
 
       void
       xgemv(const char         transA,
@@ -666,7 +666,7 @@ namespace dftfe
             const unsigned int incx,
             const float *      beta,
             float *            y,
-            const unsigned int incy) const;
+            const unsigned int incy);
 
       void
       xgemv(const char                  transA,
@@ -679,7 +679,7 @@ namespace dftfe
             const unsigned int          incx,
             const std::complex<double> *beta,
             std::complex<double> *      y,
-            const unsigned int          incy) const;
+            const unsigned int          incy);
 
       void
       xgemv(const char                 transA,
@@ -692,7 +692,7 @@ namespace dftfe
             const unsigned int         incx,
             const std::complex<float> *beta,
             std::complex<float> *      y,
-            const unsigned int         incy) const;
+            const unsigned int         incy);
 
 
 
@@ -700,7 +700,7 @@ namespace dftfe
       void
       xscal(ValueType1 *           x,
             const ValueType2       alpha,
-            const dftfe::size_type n) const;
+            const dftfe::size_type n);
 
 
 
@@ -710,7 +710,7 @@ namespace dftfe
             const double *     x,
             const unsigned int incx,
             const MPI_Comm &   mpi_communicator,
-            double *           result) const;
+            double *           result);
 
 
       // Complex double Norm2
@@ -719,7 +719,7 @@ namespace dftfe
             const std::complex<double> *x,
             const unsigned int          incx,
             const MPI_Comm &            mpi_communicator,
-            double *                    result) const;
+            double *                    result);
 
       // Real dot product
       void
@@ -728,7 +728,7 @@ namespace dftfe
            const unsigned int INCX,
            const double *     Y,
            const unsigned int INCY,
-           double *           result) const;
+           double *           result);
 
       //
       // Real dot product
@@ -739,7 +739,7 @@ namespace dftfe
            const double *     Y,
            const unsigned int INCY,
            const MPI_Comm &   mpi_communicator,
-           double *           result) const;
+           double *           result);
 
       // Complex dot product
       void
@@ -748,7 +748,7 @@ namespace dftfe
            const unsigned int          INCX,
            const std::complex<double> *Y,
            const unsigned int          INCY,
-           std::complex<double> *      result) const;
+           std::complex<double> *      result);
 
       // Complex dot product
       void
@@ -758,7 +758,7 @@ namespace dftfe
            const std::complex<double> *Y,
            const unsigned int          INCY,
            const MPI_Comm &            mpi_communicator,
-           std::complex<double> *      result) const;
+           std::complex<double> *      result);
 
       // Real double Ax+y
       void
@@ -767,7 +767,7 @@ namespace dftfe
             const double *     x,
             const unsigned int incx,
             double *           y,
-            const unsigned int incy) const;
+            const unsigned int incy);
 
       // Complex double Ax+y
       void
@@ -776,7 +776,7 @@ namespace dftfe
             const std::complex<double> *x,
             const unsigned int          incx,
             std::complex<double> *      y,
-            const unsigned int          incy) const;
+            const unsigned int          incy);
 
       // Real copy of double data
       void
@@ -784,7 +784,7 @@ namespace dftfe
             const double *     x,
             const unsigned int incx,
             double *           y,
-            const unsigned int incy) const;
+            const unsigned int incy);
 
       // Complex double copy of data
       void
@@ -792,7 +792,7 @@ namespace dftfe
             const std::complex<double> *x,
             const unsigned int          incx,
             std::complex<double> *      y,
-            const unsigned int          incy) const;
+            const unsigned int          incy);
 
       // Real copy of float data
       void
@@ -800,7 +800,7 @@ namespace dftfe
             const float *      x,
             const unsigned int incx,
             float *            y,
-            const unsigned int incy) const;
+            const unsigned int incy);
 
       // Complex float copy of data
       void
@@ -808,7 +808,7 @@ namespace dftfe
             const std::complex<float> *x,
             const unsigned int         incx,
             std::complex<float> *      y,
-            const unsigned int         incy) const;
+            const unsigned int         incy);
 
       // Real double symmetric matrix-vector product
       void
@@ -821,7 +821,7 @@ namespace dftfe
             const unsigned int INCX,
             const double *     beta,
             double *           C,
-            const unsigned int INCY) const;
+            const unsigned int INCY);
 
       void
       xgemmBatched(const char         transA,
@@ -837,7 +837,7 @@ namespace dftfe
                    const double *     beta,
                    double *           C[],
                    const unsigned int ldc,
-                   const int          batchCount) const;
+                   const int          batchCount);
 
       void
       xgemmBatched(const char                  transA,
@@ -853,7 +853,7 @@ namespace dftfe
                    const std::complex<double> *beta,
                    std::complex<double> *      C[],
                    const unsigned int          ldc,
-                   const int                   batchCount) const;
+                   const int                   batchCount);
 
       void
       xgemmBatched(const char         transA,
@@ -869,7 +869,7 @@ namespace dftfe
                    const float *      beta,
                    float *            C[],
                    const unsigned int ldc,
-                   const int          batchCount) const;
+                   const int          batchCount);
 
       void
       xgemmBatched(const char                 transA,
@@ -885,7 +885,7 @@ namespace dftfe
                    const std::complex<float> *beta,
                    std::complex<float> *      C[],
                    const unsigned int         ldc,
-                   const int                  batchCount) const;
+                   const int                  batchCount);
 
       void
       xgemmStridedBatched(const char         transA,
@@ -904,7 +904,7 @@ namespace dftfe
                           double *           C,
                           const unsigned int ldc,
                           long long int      strideC,
-                          const int          batchCount) const;
+                          const int          batchCount);
 
       void
       xgemmStridedBatched(const char                  transA,
@@ -923,7 +923,7 @@ namespace dftfe
                           std::complex<double> *      C,
                           const unsigned int          ldc,
                           long long int               strideC,
-                          const int                   batchCount) const;
+                          const int                   batchCount);
 
       void
       xgemmStridedBatched(const char                 transA,
@@ -942,7 +942,7 @@ namespace dftfe
                           std::complex<float> *      C,
                           const unsigned int         ldc,
                           long long int              strideC,
-                          const int                  batchCount) const;
+                          const int                  batchCount);
 
       void
       xgemmStridedBatched(const char         transA,
@@ -961,7 +961,7 @@ namespace dftfe
                           float *            C,
                           const unsigned int ldc,
                           long long int      strideC,
-                          const int          batchCount) const;
+                          const int          batchCount);
 
       template <typename ValueTypeComplex, typename ValueTypeReal>
       void
@@ -1041,7 +1041,7 @@ namespace dftfe
             const ValueType2   alpha,
             const ValueType1 * x,
             const ValueType2   beta,
-            ValueType1 *       y) const;
+            ValueType1 *       y);
 
       template <typename ValueType0,
                 typename ValueType1,
@@ -1055,7 +1055,7 @@ namespace dftfe
             const ValueType1 * A,
             const ValueType2 * B,
             const ValueType3 * D,
-            ValueType4 *       C) const;
+            ValueType4 *       C);
 
 
       template <typename ValueType>
@@ -1065,7 +1065,7 @@ namespace dftfe
                                 const ValueType *      addFromVec,
                                 ValueType *            addToVec,
                                 const dftfe::global_size_type
-                                  *addToVecStartingContiguousBlockIds) const;
+                                  *addToVecStartingContiguousBlockIds);
 
       template <typename ValueType1, typename ValueType2, typename ValueType3>
       void
@@ -1076,7 +1076,7 @@ namespace dftfe
                                 const ValueType2 *     addFromVec,
                                 ValueType3 *           addToVec,
                                 const dftfe::global_size_type
-                                  *addToVecStartingContiguousBlockIds) const;
+                                  *addToVecStartingContiguousBlockIds);
 
       template <typename ValueType1, typename ValueType2>
       void
@@ -1109,8 +1109,22 @@ namespace dftfe
            const ValueType        beta,
            const dftfe::size_type size);
 
+#  ifdef DFTFE_WITH_DEVICE_LANG_CUDA
       dftfe::utils::deviceBlasHandle_t &
       getDeviceBlasHandle();
+#  endif
+
+#  ifdef DFTFE_WITH_DEVICE_LANG_HIP
+      dftfe::utils::deviceBlasHandle_t &
+      getDeviceBlasHandle();
+#  endif
+
+#  ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+      dftfe::utils::deviceBlasHandle_t &
+      getDeviceStream();
+      dftfe::utils::deviceBlasHandle_t &
+      getDeviceBlasHandle();
+#  endif
 
 #  ifdef DFTFE_WITH_DEVICE_LANG_CUDA
       dftfe::utils::deviceBlasStatus_t
@@ -1125,11 +1139,23 @@ namespace dftfe
 #  endif
 
       /// storage for deviceblas handle
+#  ifdef DFTFE_WITH_DEVICE_LANG_CUDA
       dftfe::utils::deviceBlasHandle_t d_deviceBlasHandle;
       dftfe::utils::deviceStream_t     d_streamId;
+#  endif
 
-      dftfe::utils::deviceBlasStatus_t
-      create();
+#  ifdef DFTFE_WITH_DEVICE_LANG_HIP
+      dftfe::utils::deviceBlasHandle_t d_deviceBlasHandle;
+      dftfe::utils::deviceStream_t     d_streamId;
+#  endif
+
+#  ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+      dftfe::utils::deviceStream_t     d_streamId;
+
+      // template <typename Queuetype>
+      // dftfe::utils::deviceBlasStatus_t
+      // create(Queuetype     d_streamId);
+#  endif
 
       dftfe::utils::deviceBlasStatus_t
       destroy();

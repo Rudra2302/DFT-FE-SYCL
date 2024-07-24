@@ -132,6 +132,7 @@ namespace dftfe
     bool         useMixedPrecXTHXSpectrumSplit;
     bool         useMixedPrecSubspaceRotRR;
     bool         useMixedPrecCommunOnlyXTHXCGSO;
+    bool         useMixedPrecCheby;
     unsigned int spectrumSplitStartingScfIter;
     bool         useELPA;
     bool         constraintsParallelCheck;

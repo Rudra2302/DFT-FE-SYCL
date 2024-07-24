@@ -32,7 +32,6 @@ namespace dftfe
 #    ifdef DFTFE_WITH_DEVICE_AMD
       void
       initialize();
-#    endif
 
       deviceBlasStatus_t
       create(deviceBlasHandle_t *pHandle);
@@ -42,6 +41,22 @@ namespace dftfe
 
       deviceBlasStatus_t
       setStream(deviceBlasHandle_t handle, deviceStream_t stream);
+#    endif
+
+#    ifdef DFTFE_WITH_DEVICE_INTEL
+      deviceStream_t d_streamId{sycl::gpu_selector_v};
+      deviceBlasStatus_t
+      create(deviceStream_t d_streamId);
+
+      deviceBlasStatus_t
+      destroy(deviceBlasHandle_t handle);
+
+      deviceBlasStatus_t
+      setStream(deviceBlasHandle_t handle, deviceStream_t stream);
+
+      deviceBlasStatus_t
+      setMathMode(deviceBlasHandle_t handle, deviceBlasMath_t mathMode);
+#    endif
 
 #    ifdef DFTFE_WITH_DEVICE_LANG_CUDA
       deviceBlasStatus_t

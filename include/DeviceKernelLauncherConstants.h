@@ -46,6 +46,19 @@ namespace dftfe
   } // namespace utils
 } // namespace dftfe
 
+#    elif DFTFE_WITH_DEVICE_INTEL
+
+namespace dftfe
+{
+  namespace utils
+  {
+    static const int DEVICE_WARP_SIZE      = 64;
+    static const int DEVICE_MAX_BLOCK_SIZE = 1024;
+    static const int DEVICE_BLOCK_SIZE     = 512;
+
+  } // namespace utils
+} // namespace dftfe
+
 #    endif
 
 #  endif // dftfeDeviceKernelLauncherConstants_h

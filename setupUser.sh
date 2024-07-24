@@ -17,45 +17,48 @@ SRC=`dirname $0` # location of source directory
 # and optimization flag
 
 #Paths for required external libraries
-dealiiDir="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/dealiiDevCustomized/installGcc8.3CUDA11.1.1Mklscalapack"
-alglibDir="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/alglib/cpp/src"
-libxcDir="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/libxc/installGcc8.3.0Libxc5.1.3"
-spglibDir="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/spglib/installGcc8.3.0"
-xmlIncludeDir="/usr/include/libxml2"
-xmlLibDir="/usr/lib64"
-ELPA_PATH="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/elpa/install-elpa-2021.05.002-cuda"
+dealiiDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/dealii_in/lib/cmake/deal.II"
+alglibDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/alglib-cpp/src"
+libxcDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/libxc"
+spglibDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/spg"
+xmlIncludeDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/libxml/include/libxml2"
+xmlLibDir="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/libxml/lib"
+ELPA_PATH="/home/u4bd86b5d94022cecfc81890caa7faa8/dft/elpa_install"
 dftdpath=""
 numdiffdir=""
 
 
 #Paths for optional external libraries
 # path for NCCL/RCCL libraries
-DCCL_PATH="/global/project/projectdirs/m1759/dsambit/softwaresDFTFE/nccl/build"
+DCCL_PATH=""
 mdiPath=""
 torchDir=""
 
 #Toggle GPU compilation
 withGPU=ON
-gpuLang="cuda"     # Use "cuda"/"hip"
-gpuVendor="nvidia" # Use "nvidia/amd"
+gpuLang="sycl"     # Use "cuda"/"hip"/"sycl"
+gpuVendor="intel" # Use "nvidia/amd/intel"
 withGPUAwareMPI=OFF #Please use this option with care
                    #Only use if the machine supports 
                    #device aware MPI and is profiled
                    #to be fast
 
 #Option to link to DCCL library (Only for GPU compilation)
-withDCCL=ON
+withDCCL=OFF
 withMDI=OFF
 withTorch=OFF
 withCustomizedDealii=OFF
 
 #Compiler options and flags
-cxx_compiler=mpic++  #sets DCMAKE_CXX_COMPILER
-cxx_flags="-fPIC" #sets DCMAKE_CXX_FLAGS
+# cxx_compiler=/opt/intel/oneapi/compiler/2024.1/bin/icpx  #sets DCMAKE_CXX_COMPILER
+cxx_compiler=/opt/intel/oneapi/mpi/2021.12/bin/mpiicpx
+cxx_flags="-fPIC -fsycl -DMKL_ILP64  -L${MKLROOT}/lib -I/opt/intel/oneapi/mkl/2024.1/include/oneapi -lmkl_sycl_blas -lmkl_intel_ilp64 -lmkl_scalapack_ilp64 -lmkl_blacs_intelmpi_ilp64 -lmkl_sequential -lmkl_core -lsycl -lpthread -lm -ldl" #sets DCMAKE_CXX_FLAGS
 cxx_flagsRelease="-O2" #sets DCMAKE_CXX_FLAGS_RELEASE
-device_flags="-arch=sm_70" # set DCMAKE_CXX_CUDA/HIP_FLAGS 
+# device_flags="-fPIC -fsycl -DMKL_ILP64  -L${MKLROOT}/lib  -qmkl=sequential"
+# device_flags="-fPIC -fsycl -DMKL_ILP64 -L${MKLROOT}/lib -lmkl_sycl -lmkl_sycl_blas -lmkl_intel_ilp64 -lmkl_scalapack_ilp64 -lmkl_blacs_intelmpi_lp64 -lmkl_sequential -lmkl_core -lsycl -lpthread -lm -ldl" # set DCMAKE_CXX_CUDA/HIP_FLAGS 
+device_flags="-fPIC -fsycl -DMKL_ILP64  -L${MKLROOT}/lib -Wl,--no-as-needed -lmpi -lmpi_ilp64 -lmpicxx -lirc -lintlc -lmkl_lapack95_ilp64 -lmkl_blacs_intelmpi_ilp64 -lmkl_scalapack_ilp64 -lmkl_sycl_blas -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lsycl -lpthread -lm -ldl"
                            #(only applicable for withGPU=ON)
-device_architectures="70" # set DCMAKE_CXX_CUDA/HIP_ARCHITECTURES 
+device_architectures="" # set DCMAKE_CXX_CUDA/HIP_ARCHITECTURES 
                            #(only applicable for withGPU=ON)
 
 
@@ -108,6 +111,20 @@ function cmake_configure() {
     -DWITH_COMPLEX=$withComplex -DWITH_GPU=$withGPU -DGPU_LANG=$gpuLang -DGPU_VENDOR=$gpuVendor -DWITH_GPU_AWARE_MPI=$withGPUAwareMPI -DCMAKE_HIP_FLAGS="$device_flags" -DCMAKE_HIP_ARCHITECTURES="$device_architectures"\
     -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile\
     -DHIGHERQUAD_PSP=$withHigherQuadPSP $1
+    elif [ "$gpuLang" = "sycl" ]; then
+    cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$cxx_compiler\
+    -DCMAKE_CXX_FLAGS="$device_flags"\
+    -DCMAKE_CXX_FLAGS_RELEASE="$cxx_flagsRelease" \
+    -DCMAKE_BUILD_TYPE=$build_type -DDEAL_II_DIR=$dealiiDir \
+    -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir \
+    -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir \
+    -DXML_INCLUDE_DIR=$xmlIncludeDir\
+    -DWITH_MDI=$withMDI -DMDI_PATH=$mdiPath -DWITH_TORCH=$withTorch -DTORCH_DIR=$torchDir\
+    -DWITH_CUSTOMIZED_DEALII=$withCustomizedDealii\
+    -DWITH_DCCL=$withDCCL -DCMAKE_PREFIX_PATH="$ELPA_PATH;$DCCL_PATH;$dftdpath;$numdiffdir"\
+    -DWITH_COMPLEX=$withComplex -DWITH_GPU=$withGPU -DGPU_LANG=$gpuLang -DGPU_VENDOR=$gpuVendor -DWITH_GPU_AWARE_MPI=$withGPUAwareMPI\
+    -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile\
+    -DHIGHERQUAD_PSP=$withHigherQuadPSP $1
   else
     cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$cxx_compiler\
     -DCMAKE_CXX_FLAGS="$cxx_flags"\
@@ -121,7 +138,7 @@ function cmake_configure() {
     -DWITH_DCCL=$withDCCL -DCMAKE_PREFIX_PATH="$ELPA_PATH;$DCCL_PATH;$dftdpath;$numdiffdir"\
     -DWITH_COMPLEX=$withComplex \
     -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile\
-    -DHIGHERQUAD_PSP=$withHigherQuadPSP $1    
+    -DHIGHERQUAD_PSP=$withHigherQuadPSP $1
   fi
 }
 
@@ -148,5 +165,8 @@ echo -e "${Blu}Building Complex executable in $build_type mode...${RCol}"
 mkdir -p complex && cd complex
 cmake_configure "$SRC" && make -j8
 cd ..
+
+
+    # -DCMAKE_EXE_LINKER_FLAGS="-fsycl -DMKL_ILP64 -L${MKLROOT}/lib -lmkl_blacs_intelmpi_ilp64 -lmkl_scalapack_ilp64 -Wl,--no-as-needed -lmkl_gf_ilp64 -lmkl_sycl_blas -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lsycl -lpthread -lm -ldl -I${MKLROOT}/include -L/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin -lirc -limf -lsvml -lipgo" \
 
 echo -e "${Blu}Build complete.${RCol}"

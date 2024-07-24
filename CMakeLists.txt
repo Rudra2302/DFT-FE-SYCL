@@ -23,13 +23,13 @@ IF (WITH_GPU)
       enable_language(CUDA)
     ELSEIF ("${GPU_LANG}" STREQUAL "hip")
       enable_language(HIP)
+    ELSEIF ("${GPU_LANG}" STREQUAL "sycl")
     ELSE ()
       MESSAGE(FATAL_ERROR "\n"
-    "*** Could not find valid GPU_LANG=cuda/hip ***\n\n"
+    "*** Could not find valid GPU_LANG=cuda/hip/sycl ***\n\n"
     )
     ENDIF()
 ENDIF()
-
 
 ADD_EXECUTABLE(${TARGET}   src/main.cc)
 set_property(TARGET "dftfe_exe" PROPERTY OUTPUT_NAME "dftfe")
@@ -241,6 +241,34 @@ SET(DEVICE_SRC
   ./src/atom/AtomicCenteredNonLocalOperatorKernelsDevice.cc
   )
 
+ELSEIF ("${GPU_LANG}" STREQUAL "sycl")
+
+SET(DEVICE_SRC
+  ./utils/MemoryTransferKernelsDevice.cc 
+  ./utils/DeviceKernelsGeneric.sycl.cc 
+  ./utils/DeviceDirectCCLWrapper.cc 
+  ./src/dft/densityCalculatorDeviceKernels.sycl.cc 
+  ./src/dft/densityFirstOrderResponseCalculatorDeviceKernels.sycl.cc 
+  ./src/dft/solveVselfInBinsDevice.sycl.cc 
+  ./src/solvers/eigenSolvers/chebyshevOrthogonalizedSubspaceIterationSolverDevice.sycl.cc 
+  ./src/linAlg/linearAlgebraOperationsDevice.sycl.cc 
+  ./src/linAlg/pseudoGSDevice.sycl.cc #
+  ./src/linAlg/rayleighRitzDevice.sycl.cc #
+  ./src/force/forceWfcContractionsDeviceKernels.sycl.cc 
+  ./utils/constraintMatrixInfoDevice.sycl.cc 
+  ./utils/DeviceAPICalls.sycl.cc 
+  ./utils/DeviceBlasWrapper.sycl.cc 
+  ./utils/BLASWrapperDevice.sycl.cc 
+  ./utils/MPICommunicatorP2PKernelsDevice.sycl.cc
+  ./src/solvers/linearSolverDevice.cc 
+  ./src/solvers/linearSolverCGDevice.sycl.cc 
+  ./src/solvers/linearSolverProblemDevice.cc 
+  ./src/poisson/poissonSolverProblemDevice.sycl.cc 
+  ./src/helmholtz/kerkerSolverProblemDevice.sycl.cc
+  ./utils/FEBasisOperationsKernelsInternalDevice.sycl.cc 
+  ./src/atom/AtomicCenteredNonLocalOperatorKernelsDevice.sycl.cc
+  )
+
 ENDIF()
 
 
@@ -332,6 +360,8 @@ IF (WITH_GPU)
     ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_NVIDIA)
   ELSEIF ("${GPU_VENDOR}" STREQUAL "amd")
     ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_AMD)
+  ELSEIF ("${GPU_VENDOR}" STREQUAL "intel")
+    ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_INTEL)
   ENDIF()
 
   IF ("${GPU_LANG}" STREQUAL "cuda")
@@ -346,6 +376,11 @@ IF (WITH_GPU)
     ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_LANG_HIP)
     find_package(hipblas)
     target_link_libraries(${TARGETLIB} PUBLIC roc::hipblas)
+  ELSEIF ("${GPU_LANG}" STREQUAL "sycl")
+    MESSAGE(STATUS "DFTFE with GPU LANG SYCL")
+    ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_LANG_SYCL)
+    find_package(MKL REQUIRED)
+    target_link_libraries(${TARGETLIB} PUBLIC MKL::MKL)
   ENDIF()
   IF (WITH_GPU_AWARE_MPI)
     ADD_DEFINITIONS(-DDFTFE_WITH_DEVICE_AWARE_MPI)
@@ -560,9 +595,12 @@ ENDIF()
 #
 # ELPA. Pass path to -DCMAKE_PREFIX_PATH
 #
+
+add_library(empty_functions STATIC ~/dft/elpa-2024.05.001/src/empty_functions.cpp)
+
 find_package(ELPA 2024 REQUIRED)
 MESSAGE(STATUS "Will Link With ELPA")
-target_link_libraries(${TARGETLIB} PUBLIC ELPA::ELPA)
+target_link_libraries(${TARGETLIB} PUBLIC ELPA::ELPA empty_functions)
 
 #
 # NCCL. Pass path to -DCMAKE_PREFIX_PATH

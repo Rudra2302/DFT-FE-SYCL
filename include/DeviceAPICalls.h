@@ -120,7 +120,7 @@ namespace dftfe
     deviceMemcpyAsyncD2H(void *         dst,
                          const void *   src,
                          std::size_t    count,
-                         deviceStream_t stream = 0);
+                         deviceStream_t stream);
 
     /**
      * @brief Copy array from device to device
@@ -130,7 +130,7 @@ namespace dftfe
     deviceMemcpyAsyncD2D(void *         dst,
                          const void *   src,
                          std::size_t    count,
-                         deviceStream_t stream = 0);
+                         deviceStream_t stream);
 
     /**
      * @brief Copy array from host to device
@@ -140,7 +140,7 @@ namespace dftfe
     deviceMemcpyAsyncH2D(void *         dst,
                          const void *   src,
                          std::size_t    count,
-                         deviceStream_t stream = 0);
+                         deviceStream_t stream);
 
 
     deviceError_t
@@ -159,7 +159,7 @@ namespace dftfe
     deviceEventDestroy(deviceEvent_t event);
 
     deviceError_t
-    deviceEventRecord(deviceEvent_t event, deviceStream_t stream = 0);
+    deviceEventRecord(deviceEvent_t event, deviceStream_t stream);
 
     deviceError_t
     deviceEventSynchronize(deviceEvent_t event);

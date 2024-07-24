@@ -248,6 +248,22 @@ namespace dftfe
                                  const unsigned int    blockSize) const;
 
       void
+      distribute_slave_to_master(
+        distributedDeviceVec<double> &fieldVector) const;
+
+      void
+      distribute_slave_to_master(
+        distributedDeviceVec<float> &fieldVector) const;
+
+      void
+      distribute_slave_to_master(
+        distributedDeviceVec<std::complex<double>> &fieldVector) const;
+
+    void
+      distribute_slave_to_master(
+        distributedDeviceVec<std::complex<float>> &fieldVector) const;
+
+      void
       initializeScaledConstraints(
         const distributedCPUVec<double> &invSqrtMassVec);
 

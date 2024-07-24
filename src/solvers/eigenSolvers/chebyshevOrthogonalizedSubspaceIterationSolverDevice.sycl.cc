@@ -490,7 +490,7 @@ namespace dftfe
                              (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
                               dftfe::utils::DEVICE_BLOCK_SIZE * localVectorSize) * dftfe::utils::DEVICE_BLOCK_SIZE;
             dftfe::utils::deviceStream_t stream = BLASWrapperPtr->getDeviceStream();
-            sycl::event event = stream.parallel_for(
+            dftfe::utils::deviceEvent_t event = stream.parallel_for(
                                         sycl::nd_range<1>(total_workitems,dftfe::utils::DEVICE_BLOCK_SIZE), 
                                         [=](sycl::nd_item<1> ind){
                 setZeroKernel(ind, 
@@ -1013,7 +1013,7 @@ namespace dftfe
                          (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
                           dftfe::utils::DEVICE_BLOCK_SIZE * localVectorSize) * dftfe::utils::DEVICE_BLOCK_SIZE;
                     dftfe::utils::deviceStream_t stream = BLASWrapperPtr->getDeviceStream();
-                    sycl::event event = stream.parallel_for(
+                    dftfe::utils::deviceEvent_t event = stream.parallel_for(
                                                 sycl::nd_range<1>(total_workitems,dftfe::utils::DEVICE_BLOCK_SIZE), 
                                                 [=](sycl::nd_item<1> ind){
                         setZeroKernel(ind, 

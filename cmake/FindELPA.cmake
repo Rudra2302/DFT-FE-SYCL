@@ -17,8 +17,8 @@
 find_package(PkgConfig)
 # elpa-2020.05.001.pc
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH TRUE)
-foreach(pkg elpa_openmp elpa) # prioritize elpa_openmp
-    foreach(ver 2024.03.001)
+foreach(pkg elpa_onenode_openmp elpa_openmp elpa) # prioritize elpa_openmp
+    foreach(ver 2024.05.001)
         pkg_search_module(PC_ELPA ${pkg})
         if(PC_ELPA_FOUND)
             break()

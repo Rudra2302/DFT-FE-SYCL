@@ -44,7 +44,6 @@ namespace dftfe
 #    endif
 
 #    ifdef DFTFE_WITH_DEVICE_INTEL
-      deviceStream_t d_streamId{sycl::gpu_selector_v};
       deviceBlasStatus_t
       create(deviceStream_t d_streamId);
 

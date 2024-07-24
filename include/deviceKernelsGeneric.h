@@ -53,7 +53,7 @@ namespace dftfe
       copyValueType1ArrToValueType2Arr(const dftfe::size_type size,
                                        const ValueType1 *     valueType1Arr,
                                        ValueType2 *           valueType2Arr,
-                                       const deviceStream_t   streamId = sycl::queue{sycl::gpu_selector_v});
+                                       const deviceStream_t   streamId = dftfe::utils::deviceStream_t{sycl::gpu_selector_v});
 
 
       template <typename ValueType1, typename ValueType2>

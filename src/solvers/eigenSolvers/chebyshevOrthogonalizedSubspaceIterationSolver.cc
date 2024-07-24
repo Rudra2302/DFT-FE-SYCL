@@ -323,18 +323,18 @@ namespace dftfe
                     eigenValuesBlock[i] = eigenValues[jvec + i];
                   }
 
-                linearAlgebraOperations::chebyshevFilterSinglePrec(
-                  BLASWrapperPtr,
-                  operatorMatrix,
-                  (*eigenVectorsFlattenedArrayBlock),
-                  (*eigenVectorsFlattenedArrayBlock2),
-                  (*eigenVectorsFlattenedArrayBlockFP32),
-                  (*eigenVectorsFlattenedArrayBlock2FP32),
-                  eigenValuesBlock,
-                  chebyshevOrder,
-                  d_lowerBoundUnWantedSpectrum,
-                  d_upperBoundUnWantedSpectrum,
-                  d_lowerBoundWantedSpectrum);
+                // linearAlgebraOperations::chebyshevFilterSinglePrec(
+                //   BLASWrapperPtr,
+                //   operatorMatrix,
+                //   (*eigenVectorsFlattenedArrayBlock),
+                //   (*eigenVectorsFlattenedArrayBlock2),
+                //   (*eigenVectorsFlattenedArrayBlockFP32),
+                //   (*eigenVectorsFlattenedArrayBlock2FP32),
+                //   eigenValuesBlock,
+                //   chebyshevOrder,
+                //   d_lowerBoundUnWantedSpectrum,
+                //   d_upperBoundUnWantedSpectrum,
+                //   d_lowerBoundWantedSpectrum);
               }
             else
               linearAlgebraOperations::chebyshevFilter(

@@ -144,5 +144,5 @@ namespace dftfe
 
   } // namespace utils
 } // namespace dftfe
-#include "../utils/Exceptions.t.cc"
+#include "Exceptions.t.cc"
 #endif // dftfeExceptions_h

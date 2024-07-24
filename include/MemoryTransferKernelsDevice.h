@@ -23,6 +23,7 @@
 
 #ifdef DFTFE_WITH_DEVICE
 #  include <TypeConfig.h>
+#  include <cstdlib>
 
 namespace dftfe
 {

@@ -240,7 +240,7 @@ namespace dftfe
       template <typename NumberType>
       void
       distribute_slave_to_master(
-        distributedDeviceVec<NumberType> &fieldVector) const;
+        distributedDeviceVec<NumberType> &fieldVector);
 
       template <typename T>
       void
@@ -249,19 +249,19 @@ namespace dftfe
 
       void
       distribute_slave_to_master(
-        distributedDeviceVec<double> &fieldVector) const;
+        distributedDeviceVec<double> &fieldVector);
 
       void
       distribute_slave_to_master(
-        distributedDeviceVec<float> &fieldVector) const;
+        distributedDeviceVec<float> &fieldVector);
 
       void
       distribute_slave_to_master(
-        distributedDeviceVec<std::complex<double>> &fieldVector) const;
+        distributedDeviceVec<std::complex<double>> &fieldVector);
 
     void
       distribute_slave_to_master(
-        distributedDeviceVec<std::complex<float>> &fieldVector) const;
+        distributedDeviceVec<std::complex<float>> &fieldVector);
 
       void
       initializeScaledConstraints(

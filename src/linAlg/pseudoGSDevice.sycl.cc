@@ -241,17 +241,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                // ADD EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   0,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    0,
                                    &error);
                   AssertThrow(error == ELPA_OK,
@@ -270,17 +261,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                // ADD EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   1,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    1,
                                    &error);
                   AssertThrow(error == ELPA_OK,

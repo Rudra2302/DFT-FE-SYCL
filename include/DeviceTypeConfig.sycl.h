@@ -31,13 +31,16 @@ namespace dftfe
     typedef std::complex<float>  deviceFloatComplex;
 
     // static consts
+    static std::error_code success_code = make_error_code(sycl::errc::success);
+    static deviceError_t deviceSuccess(success_code);
 
+    // vendor blas related typedef and static consts
     typedef sycl::queue                                   deviceBlasHandle_t;
     typedef oneapi::mkl::transpose                          deviceBlasOperation_t;
     typedef oneapi::mkl::blas::compute_mode                 deviceBlasMath_t;
-    typedef sycl::info::event::command_execution_status     deviceBlasStatus_t;
+    typedef sycl::info::event_command_status     deviceBlasStatus_t;
     
-    static const sycl::info::event_command_status deviceSuccess = sycl::info::event_command_status::complete;
+    static const sycl::info::event_command_status deviceBlasSuccess = sycl::info::event_command_status::complete;
 
     static const oneapi::mkl::transpose DEVICEBLAS_OP_N = oneapi::mkl::transpose::nontrans;
     static const oneapi::mkl::transpose DEVICEBLAS_OP_T = oneapi::mkl::transpose::trans;

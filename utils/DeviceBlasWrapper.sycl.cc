@@ -48,19 +48,19 @@ namespace dftfe
       create(deviceStream_t d_streamId)
       {
         d_streamId = dftfe::utils::deviceStream_t{sycl::gpu_selector_v}; //, exception_handler);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
       destroy(deviceBlasHandle_t handle)
       {
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
       setStream(deviceBlasHandle_t handle, deviceStream_t stream)
       {
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -78,7 +78,7 @@ namespace dftfe
             setenv("MKL_BLAS_COMPUTE_MODE", "FLOAT_TO_BF16X3", 1);
         else if(mathMode == oneapi::mkl::blas::compute_mode::complex_3m)
             setenv("MKL_BLAS_COMPUTE_MODE", "COMPLEX_3M", 1);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -89,9 +89,9 @@ namespace dftfe
            double *           y,
            int                incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::copy(d_streamId, n, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::copy(d_streamId, n, x, incx, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -101,9 +101,9 @@ namespace dftfe
            int                incx,
            double *           result)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::nrm2(d_streamId, n, x, incx, result);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::nrm2(d_streamId, n, x, incx, result);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -115,9 +115,9 @@ namespace dftfe
           int                incy,
           double *           result)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::dot(d_streamId, n, x, incx, y, incy, result);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::dot(d_streamId, n, x, incx, y, incy, result);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -129,9 +129,9 @@ namespace dftfe
            double *           y,
            int                incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -150,10 +150,10 @@ namespace dftfe
            double *              C,
            int                   ldc)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -172,10 +172,10 @@ namespace dftfe
            float *               C,
            int                   ldc)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -194,10 +194,10 @@ namespace dftfe
            std::complex<double> *      C,
            int                         ldc)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -216,10 +216,10 @@ namespace dftfe
            std::complex<float> *      C,
            int                        ldc)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -240,11 +240,11 @@ namespace dftfe
                   int                   batchCount)
       {
         const long* group_size;
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
         //                                                                Aarray, lda, Barray, ldb, beta,
         //                                                                Carray, ldc, batchCount, group_size);
         // DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -265,11 +265,11 @@ namespace dftfe
                   int                         batchCount)
       {
         const long* group_size;
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
         //                                                                Aarray, lda, Barray, ldb, beta,
         //                                                                Carray, ldc, batchCount, group_size);
         // DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -292,12 +292,12 @@ namespace dftfe
                          long long int         strideC,
                          int                   batchCount)
       {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
-        //                                                                 A, lda, strideA, 
-        //                                                                 B, ldb, strideB, beta, 
-        //                                                                 C, ldc, strideC, batchCount);
-        // DEVICEBLAS_API_CHECK(event);
-        return {};
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+                                                                        A, lda, strideA, 
+                                                                        B, ldb, strideB, beta, 
+                                                                        C, ldc, strideC, batchCount);
+        DEVICEBLAS_API_CHECK(event);
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -320,12 +320,12 @@ namespace dftfe
                          long long int         strideC,
                          int                   batchCount)
       {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
-        //                                                                 A, lda, strideA, 
-        //                                                                 B, ldb, strideB, beta, 
-        //                                                                 C, ldc, strideC, batchCount);
-        // DEVICEBLAS_API_CHECK(event);
-        return {};
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+                                                                        A, lda, strideA, 
+                                                                        B, ldb, strideB, beta, 
+                                                                        C, ldc, strideC, batchCount);
+        DEVICEBLAS_API_CHECK(event);
+        return dftfe::utils::deviceBlasSuccess;
       }
 
 
@@ -349,12 +349,12 @@ namespace dftfe
                          long long int               strideC,
                          int                         batchCount)
       {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
-        //                                                                 A, lda, strideA, 
-        //                                                                 B, ldb, strideB, beta, 
-        //                                                                 C, ldc, strideC, batchCount);
-        // DEVICEBLAS_API_CHECK(event);
-        return {};
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+                                                                        A, lda, strideA, 
+                                                                        B, ldb, strideB, beta, 
+                                                                        C, ldc, strideC, batchCount);
+        DEVICEBLAS_API_CHECK(event);
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -377,12 +377,12 @@ namespace dftfe
                          long long int              strideC,
                          int                        batchCount)
       {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
-        //                                                                 A, lda, strideA, 
-        //                                                                 B, ldb, strideB, beta, 
-        //                                                                 C, ldc, strideC, batchCount);
-        // DEVICEBLAS_API_CHECK(event);
-        return {};
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+                                                                        A, lda, strideA, 
+                                                                        B, ldb, strideB, beta, 
+                                                                        C, ldc, strideC, batchCount);
+        DEVICEBLAS_API_CHECK(event);
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -399,10 +399,10 @@ namespace dftfe
            double *              y,
            int                   incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, trans, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, trans, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -419,10 +419,10 @@ namespace dftfe
            float *               y,
            int                   incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, trans, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, trans, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -439,10 +439,10 @@ namespace dftfe
            std::complex<double> *      y,
            int                         incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, trans, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, trans, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
       deviceBlasStatus_t
@@ -459,10 +459,10 @@ namespace dftfe
            std::complex<float> *      y,
            int                        incy)
       {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, trans, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, trans, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICEBLAS_API_CHECK(event);
-        return {};
+        return dftfe::utils::deviceBlasSuccess;
       }
 
     } // namespace deviceBlasWrapper

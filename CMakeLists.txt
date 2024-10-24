@@ -596,11 +596,12 @@ ENDIF()
 # ELPA. Pass path to -DCMAKE_PREFIX_PATH
 #
 
-add_library(empty_functions STATIC ~/dft/elpa-2024.05.001/src/empty_functions.cpp)
+# add_library(empty_functions STATIC ~/dft/elpa-2024.05.001/src/empty_functions.cpp)
 
 find_package(ELPA 2024 REQUIRED)
 MESSAGE(STATUS "Will Link With ELPA")
-target_link_libraries(${TARGETLIB} PUBLIC ELPA::ELPA empty_functions)
+target_link_libraries(${TARGETLIB} PUBLIC ELPA::ELPA)
+# target_link_libraries(${TARGETLIB} PUBLIC ELPA::ELPA empty_functions)
 
 #
 # NCCL. Pass path to -DCMAKE_PREFIX_PATH

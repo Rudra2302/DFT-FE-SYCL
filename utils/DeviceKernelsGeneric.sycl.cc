@@ -390,27 +390,28 @@ namespace dftfe
           const double *                    x,
           const double                      alpha,
           const dftfe::size_type            size,
-          dftfe::utils::deviceStream_t d_streamId)
+          dftfe::utils::deviceStream_t      d_streamId)
       {
         dftfe::size_type incx = 1, incy = 1;
-        // dftfe::utils::deviceBlasWrapper::axpy(deviceBlasWrapper::d_streamId, size, &alpha, x, incx, y, incy);
+        dftfe::utils::deviceBlasWrapper::axpy(
+          d_streamId, size, &alpha, x, incx, y, incy);
       }
 
       double
       l2_norm(const double *                    x,
               const dftfe::size_type            size,
               const MPI_Comm &                  mpi_communicator,
-              dftfe::utils::deviceStream_t d_streamId)
+              dftfe::utils::deviceStream_t      d_streamId)
       {
         dftfe::size_type incx = 1;
         double           local_nrm, nrm = 0;
 
-        // dftfe::utils::deviceBlasWrapper::nrm2(
-        //   deviceBlasHandle, size, x, incx, &local_nrm);
+        dftfe::utils::deviceBlasWrapper::nrm2(
+          d_streamId, size, x, incx, &local_nrm);
 
-        // local_nrm *= local_nrm;
-        // MPI_Allreduce(
-        //   &local_nrm, &nrm, 1, MPI_DOUBLE, MPI_SUM, mpi_communicator);
+        local_nrm *= local_nrm;
+        MPI_Allreduce(
+          &local_nrm, &nrm, 1, MPI_DOUBLE, MPI_SUM, mpi_communicator);
 
         return std::sqrt(nrm);
       }
@@ -420,14 +421,14 @@ namespace dftfe
           const double *                    y,
           const dftfe::size_type            size,
           const MPI_Comm &                  mpi_communicator,
-          dftfe::utils::deviceStream_t streamId)
+          dftfe::utils::deviceStream_t      d_streamId)
       {
         dftfe::size_type incx = 1, incy = 1;
         double           local_sum, sum = 0;
 
-        // dftfe::utils::deviceBlasWrapper::dot(size, x, incx, y, incy, &local_sum);
-        // MPI_Allreduce(
-        //   &local_sum, &sum, 1, MPI_DOUBLE, MPI_SUM, mpi_communicator);
+        dftfe::utils::deviceBlasWrapper::dot(d_streamId, size, x, incx, y, incy, &local_sum);
+        MPI_Allreduce(
+          &local_sum, &sum, 1, MPI_DOUBLE, MPI_SUM, mpi_communicator);
 
         return sum;
       }

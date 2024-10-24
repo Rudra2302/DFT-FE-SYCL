@@ -202,7 +202,6 @@ namespace dftfe
         // constraintsMatrixDataInfoDevice.distribute(src,numberVectors);
         temp.updateGhostValues();
         constraintsMatrixDataInfoDevice.distribute(temp);
-
         if ((localSize + ghostSize) > 0){
 #  ifdef DFTFE_WITH_DEVICE_LANG_SYCL
           size_t total_workitems = (numberVectors + (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
@@ -244,7 +243,7 @@ namespace dftfe
 
         //
         // do matrix-matrix multiplication
-        //
+        // 
         dftfe::utils::deviceBlasWrapper::gemmStridedBatched(
           stream,
           dftfe::utils::DEVICEBLAS_OP_N,
@@ -370,22 +369,33 @@ namespace dftfe
           DEVICE_API_CHECK(event);
 #  endif
         }
-
         const double alpha = 1.0, beta = 0.0;
+        int sycl1 = 1, sycl2 = 1, sycl3 = 1;
         dftfe::utils::deviceBlasWrapper::gemm(stream,
                                               dftfe::utils::DEVICEBLAS_OP_N,
                                               dftfe::utils::DEVICEBLAS_OP_T,
-                                              1,
+                                              sycl1,
                                               numberVectors,
                                               localSize,
                                               &alpha,
                                               onesVec,
-                                              1,
+                                              sycl2,
                                               vecTemp,
                                               numberVectors,
                                               &beta,
                                               residualNormSq,
-                                              1);
+                                              sycl3);
+
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                        sycl::nd_range<1>(total_workitems,dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                        [=](sycl::nd_item<1> ind){
+          });
+
+        Q.parallel_for<class MatMul1D>(range<1>(N), [=](id<1> ind){
+            for (int j = 0; j < N; j++)
+                for (int k = 0; k < N; k++)
+                    C_device[j + ind * N] += A_device[k + ind * N] * B_device[j + k * N];
+        }).wait;
       }
     } // namespace
 
@@ -511,7 +521,7 @@ namespace dftfe
       constraintsMatrixDataInfoDevice.set_zero(xD);
 
       dftfe::utils::deviceSynchronize();
-      stream.wait();
+      (BLASWrapperPtr->getDeviceStream()).wait();
       MPI_Barrier(mpiCommParent);
       time = MPI_Wtime();
 
@@ -548,7 +558,7 @@ namespace dftfe
                                       sizeof(dealii::types::global_dof_index));
 
       dftfe::utils::deviceSynchronize();
-      stream.wait();
+      (BLASWrapperPtr->getDeviceStream()).wait();
       MPI_Barrier(mpiCommParent);
       time = MPI_Wtime() - time;
       if (verbosity >= 2 && this_process == 0)
@@ -754,6 +764,29 @@ namespace dftfe
       precondition_Jacobi(
         r.begin(), diagonalAD, numberBins, localSize, d.begin());
 
+      // sycl::queue queue{sycl::gpu_selector_v};
+      // double temp_syclr[4], temp_sycld[4], temp_syclvec[4], temp_syclones[4], temp_sycldelta[4];
+      // queue.memcpy(temp_syclr, r.begin(), 4*sizeof(double));
+      //   queue.memcpy(temp_sycld, d.begin(), 4*sizeof(double));
+      //   queue.memcpy(temp_syclvec, vecTempD.begin(), 4*sizeof(double));
+      //   queue.memcpy(temp_syclones, onesVecD.begin(), 4*sizeof(double));
+      //   queue.memcpy(temp_sycldelta, delta_newD.begin(), 4*sizeof(double));
+
+      // std::cout<<std::endl<<"r is: ";
+      // for(int i = 0; i < 4; i++)
+      //     std::cout<<temp_syclr[i]<<" ";
+      // std::cout<<std::endl<<"d is: ";
+      // for(int i = 0; i < 4; i++)
+      //     std::cout<<temp_sycld[i]<<" ";
+      // std::cout<<std::endl<<"vec is: ";
+      // for(int i = 0; i < 4; i++)
+      //     std::cout<<temp_syclvec[i]<<" ";
+      // std::cout<<std::endl<<"ones is: ";
+      // for(int i = 0; i < 4; i++)
+      //     std::cout<<temp_syclones[i]<<" ";
+      // std::cout<<std::endl<<"delta is: ";
+      // for(int i = 0; i < 4; i++)
+      //     std::cout<<temp_sycldelta[i]<<" ";
 
       computeResidualSq(stream,
                         r.begin(),
@@ -851,9 +884,12 @@ namespace dftfe
                             localSize,
                             scalarD.begin());
 
-          dftfe::utils::deviceMemcpyD2H(&scalarH[0],
-                                        scalarD.begin(),
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyD2H(&scalarH[0],
+          //                               scalarD.begin(),
+          //                               numberBins * sizeof(double));
+            stream.memcpy(&scalarH[0],
+                        scalarD.begin(),
+                        numberBins * sizeof(double));
 
 
           MPI_Allreduce(MPI_IN_PLACE,
@@ -872,9 +908,12 @@ namespace dftfe
           // for (unsigned int i=0;i <numberBins; i++)
           //   std::cout<< "alpha "<<alphaH[i]<<std::endl;
 
-          dftfe::utils::deviceMemcpyH2D(alphaD.begin(),
-                                        &alphaH[0],
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyH2D(alphaD.begin(),
+          //                               &alphaH[0],
+          //                               numberBins * sizeof(double));
+            stream.memcpy(alphaD.begin(),
+                        &alphaH[0],
+                        numberBins * sizeof(double));
 
           // update x; x = x + alpha*d
           if (localSize > 0){
@@ -942,6 +981,20 @@ namespace dftfe
             {
               // negAlphaD = -alpha;
               if (localSize > 0){
+                  double temp_syclq[numberBins], temp_syclalphaD[numberBins];
+                  stream.memcpy(&temp_syclq[0],
+                        q.begin(),
+                        numberBins * sizeof(double));
+                  stream.memcpy(&temp_syclalphaD[0],
+                        alphaD.begin(),
+                        numberBins * sizeof(double));
+                  std::cout<<"temp_syclq: ";
+                  for(int i = 0; i < numberBins; i++){
+                      std::cout<<temp_syclq[i]<<" ";
+                  }std::cout<<std::endl<<"temp_syclalphaD: ";
+                  for(int i = 0; i < numberBins; i++){
+                      std::cout<<temp_syclalphaD[i]<<" ";
+                  }
 #  ifdef DFTFE_WITH_DEVICE_LANG_SYCL
                 size_t total_workitems =  ((numberBins + (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
                                             dftfe::utils::DEVICE_BLOCK_SIZE * localSize) * dftfe::utils::DEVICE_BLOCK_SIZE;
@@ -951,7 +1004,7 @@ namespace dftfe
                 dftfe::utils::deviceEvent_t event = stream.parallel_for(
                                               sycl::nd_range<1>(total_workitems,dftfe::utils::DEVICE_BLOCK_SIZE), 
                                               [=](sycl::nd_item<1> ind){
-                      dmaxpyBlockedKernel(ind, numberBins, localSize, q_begin, alphaD_begin, r_begin);
+                      // dmaxpyBlockedKernel(ind, numberBins, localSize, q_begin, alphaD_begin, r_begin);
                 });
                 DEVICE_API_CHECK(event);
 #  endif
@@ -964,9 +1017,12 @@ namespace dftfe
 
           delta_oldD = delta_newD;
 
-          dftfe::utils::deviceMemcpyD2H(&delta_oldH[0],
-                                        delta_oldD.begin(),
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyD2H(&delta_oldH[0],
+          //                               delta_oldD.begin(),
+          //                               numberBins * sizeof(double));
+            stream.memcpy(&delta_oldH[0],
+                        delta_oldD.begin(),
+                        numberBins * sizeof(double));
 
 
           // delta_new = r*s;
@@ -982,9 +1038,12 @@ namespace dftfe
           // beta = delta_new/delta_old;
 
 
-          dftfe::utils::deviceMemcpyD2H(&delta_newH[0],
-                                        delta_newD.begin(),
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyD2H(&delta_newH[0],
+          //                               delta_newD.begin(),
+          //                               numberBins * sizeof(double));
+          stream.memcpy(&delta_newH[0],
+                        delta_newD.begin(),
+                        numberBins * sizeof(double));
 
 
           MPI_Allreduce(MPI_IN_PLACE,
@@ -1001,13 +1060,19 @@ namespace dftfe
           for (unsigned int i = 0; i < numberBins; i++)
             betaH[i] = delta_newH[i] / delta_oldH[i];
 
-          dftfe::utils::deviceMemcpyH2D(betaD.begin(),
-                                        &betaH[0],
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyH2D(betaD.begin(),
+          //                               &betaH[0],
+          //                               numberBins * sizeof(double));
+          stream.memcpy(betaD.begin(),
+                        &betaH[0],
+                        numberBins * sizeof(double));
 
-          dftfe::utils::deviceMemcpyH2D(delta_newD.begin(),
-                                        &delta_newH[0],
-                                        numberBins * sizeof(double));
+          // dftfe::utils::deviceMemcpyH2D(delta_newD.begin(),
+          //                               &delta_newH[0],
+          //                               numberBins * sizeof(double));
+          stream.memcpy(delta_newD.begin(),
+                        &delta_newH[0],
+                        numberBins * sizeof(double));
 
           // d *= beta;
           if (localSize > 0){
@@ -1045,9 +1110,11 @@ namespace dftfe
           // if(delta_new < relTolerance*relTolerance*delta_0)
           //  isBreak = 1;
 
-          for (unsigned int i = 0; i < numberBins; i++)
+          for (unsigned int i = 0; i < numberBins; i++){
+              std::cout<<delta_newH[i]<<" ";
             if (delta_newH[i] > absTol * absTol)
               isBreak = 0;
+          }
 
           if (isBreak == 1)
             break;

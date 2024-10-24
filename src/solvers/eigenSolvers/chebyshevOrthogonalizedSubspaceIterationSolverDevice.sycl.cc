@@ -530,20 +530,20 @@ namespace dftfe
         MPI_Barrier(interBandGroupComm);
 
 
-        // MPI_Allreduce(MPI_IN_PLACE,
-        //               eigenVectorsFlattened,
-        //               totalNumberWaveFunctions * localVectorSize,
-        //               dataTypes::mpi_type_id(&eigenVectorsFlattened[0]),
-        //               MPI_SUM,
-        //               interBandGroupComm);
+        MPI_Allreduce(MPI_IN_PLACE,
+                      &eigenVectorsFlattened[0],
+                      totalNumberWaveFunctions * localVectorSize,
+                      dataTypes::mpi_type_id(&eigenVectorsFlattened[0]),
+                      MPI_SUM,
+                      interBandGroupComm);
 
-        // MPI_Barrier(interBandGroupComm);
+        MPI_Barrier(interBandGroupComm);
 
-        // dftfe::utils::deviceMemcpyH2D(
-        //   eigenVectorsFlattenedDevice,
-        //   eigenVectorsFlattened,
-        //   totalNumberWaveFunctions * localVectorSize *
-        //     sizeof(dataTypes::number));
+        dftfe::utils::deviceMemcpyH2D(
+          eigenVectorsFlattenedDevice,
+          &eigenVectorsFlattened[0],
+          totalNumberWaveFunctions * localVectorSize *
+            sizeof(dataTypes::number));
       }
 
     // if (d_dftParams.measureOnlyChebyTime)

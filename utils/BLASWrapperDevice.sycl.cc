@@ -79,7 +79,7 @@ namespace dftfe
     // dftfe::utils::deviceBlasStatus_t create(dftfe::utils::deviceStream_t d_streamId)
     // {
     //   d_streamId = sycl::queue{sycl::gpu_selector_v, exception_handler};
-    //   return {};
+    //   return dftfe::utils::deviceBlasSuccess;
     // }
 
     dftfe::utils::deviceBlasStatus_t setMathMode(dftfe::utils::deviceBlasMath_t mathMode){
@@ -95,7 +95,7 @@ namespace dftfe
         setenv("MKL_BLAS_COMPUTE_MODE", "FLOAT_TO_BF16X3", 1);
       else if(mathMode == oneapi::mkl::blas::compute_mode::complex_3m)
         setenv("MKL_BLAS_COMPUTE_MODE", "COMPLEX_3M", 1);
-      return {};
+      return dftfe::utils::deviceBlasSuccess;
     }
 
     template <typename ValueType>
@@ -130,7 +130,7 @@ namespace dftfe
         double *           y,
         const unsigned int incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::copy(d_streamId, n, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::copy(d_streamId, n, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -142,7 +142,7 @@ namespace dftfe
         std::complex<double> *      y,
         const unsigned int          incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::copy(d_streamId, n, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::copy(d_streamId, n, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -154,7 +154,7 @@ namespace dftfe
         float                *y,
         const unsigned int    incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::copy(d_streamId, n, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::copy(d_streamId, n, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -166,7 +166,7 @@ namespace dftfe
         std::complex<float>            *y,
         const unsigned int    incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::copy(d_streamId, n, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::copy(d_streamId, n, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -208,7 +208,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICE_API_CHECK(event);
     }
@@ -251,7 +251,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICE_API_CHECK(event);
     }
@@ -294,7 +294,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICE_API_CHECK(event);
     }
@@ -337,7 +337,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm(d_streamId, transa, transb, m, n, k, alpha,
                                                                 A, lda, B, ldb, beta, C, ldc);
         DEVICE_API_CHECK(event);
     }
@@ -368,7 +368,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, transa, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, transa, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICE_API_CHECK(event);
     }
@@ -399,7 +399,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, transa, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, transa, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICE_API_CHECK(event);
     }
@@ -430,7 +430,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, transa, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, transa, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICE_API_CHECK(event);
     }
@@ -461,7 +461,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemv(d_streamId, transa, m, n, alpha,
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemv(d_streamId, transa, m, n, alpha,
                                                                 A, lda, x, incx, beta, y, incy);
         DEVICE_API_CHECK(event);
     }
@@ -475,7 +475,7 @@ namespace dftfe
       double *        y,
       const unsigned int incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -488,7 +488,7 @@ namespace dftfe
       std::complex<double> *        y,
       const unsigned int incy)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::axpy(d_streamId, n, alpha, x, incx, y, incy);
         DEVICE_API_CHECK(event);
     }
 
@@ -511,7 +511,7 @@ namespace dftfe
       const unsigned int incy,
       double *        result)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::dot(d_streamId, n, x, incx, y, incy, result);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::dot(d_streamId, n, x, incx, y, incy, result);
         DEVICE_API_CHECK(event);
     }
 
@@ -524,8 +524,8 @@ namespace dftfe
       const unsigned int incy,
       std::complex<double> *        result)
     {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::dot(d_streamId, n, x, incx, y, incy, result);
-        // DEVICE_API_CHECK(event);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::dotu(d_streamId, n, x, incx, y, incy, result);
+        DEVICE_API_CHECK(event);
     }
 
     void
@@ -538,8 +538,17 @@ namespace dftfe
       const MPI_Comm &   mpi_communicator,
       std::complex<double> *        result)
     {
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::dot(d_streamId, n, x, incx, y, incy, result);
-        // DEVICE_API_CHECK(event);
+        std::complex<double> localResult(0.0, 0.0);
+        *result = std::complex<double>(0.0, 0.0);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::dotu(d_streamId, n, x, incx, y, incy, &localResult);
+        DEVICE_API_CHECK(event);
+        MPI_Allreduce(&localResult,
+                    result,
+                    1,
+                    dataTypes::mpi_type_id(result),
+                    MPI_SUM,
+                    mpi_communicator);
+        
     }
 
     void
@@ -552,8 +561,12 @@ namespace dftfe
       const MPI_Comm &   mpi_communicator,
       double *        result)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::dot(d_streamId, n, x, incx, y, incy, result);
+        double localResult                      = 0.0;
+        *result                                 = 0.0;
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::dot(d_streamId, n, x, incx, y, incy, &localResult);
         DEVICE_API_CHECK(event);
+        MPI_Allreduce(
+          &localResult, result, 1, MPI_DOUBLE, MPI_SUM, mpi_communicator);
     }
 
     void
@@ -564,7 +577,7 @@ namespace dftfe
       const MPI_Comm &   mpi_communicator,
       double *                    result)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::nrm2(d_streamId, n, x, incx, result);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::nrm2(d_streamId, n, x, incx, result);
         DEVICE_API_CHECK(event);
     }
 
@@ -576,7 +589,7 @@ namespace dftfe
       const MPI_Comm &   mpi_communicator,
       double *                    result)
     {
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::nrm2(d_streamId, n, x, incx, result);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::nrm2(d_streamId, n, x, incx, result);
         DEVICE_API_CHECK(event);
     }
 
@@ -587,7 +600,7 @@ namespace dftfe
       const dftfe::size_type n)
     {
         const unsigned int incx = 1;
-        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::scal(d_streamId, n, alpha, x, incx);
+        dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::scal(d_streamId, n, alpha, x, incx);
         DEVICE_API_CHECK(event);
     }
 
@@ -633,7 +646,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
         //                                                                 A, lda, strideA, 
         //                                                                 B, ldb, strideB, beta, 
         //                                                                 C, ldc, strideC, batchCount);
@@ -682,7 +695,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
         //                                                                 A, lda, strideA, 
         //                                                                 B, ldb, strideB, beta, 
         //                                                                 C, ldc, strideC, batchCount);
@@ -731,7 +744,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
         //                                                                 A, lda, strideA, 
         //                                                                 B, ldb, strideB, beta, 
         //                                                                 C, ldc, strideC, batchCount);
@@ -780,7 +793,7 @@ namespace dftfe
           // Assert Statement
         }
 
-        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
+        // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, transa, transb, m, n, k, alpha, 
         //                                                                 A, lda, strideA, 
         //                                                                 B, ldb, strideB, beta, 
         //                                                                 C, ldc, strideC, batchCount);
@@ -826,7 +839,7 @@ namespace dftfe
           // Assert Statement
         }
         const long* group_size;
-      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
       //                                                                  A, lda, B, ldb, beta,
       //                                                                  C, ldc, batchCount, group_size);
       // DEVICE_API_CHECK(event);
@@ -871,7 +884,7 @@ namespace dftfe
           // Assert Statement
         }
         const long* group_size;
-      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
       //                                                                  A, lda, B, ldb, beta,
       //                                                                  C, ldc, batchCount, group_size);
       // DEVICE_API_CHECK(event);
@@ -916,7 +929,7 @@ namespace dftfe
           // Assert Statement
         }
         const long* group_size;
-      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
       //                                                                  A, lda, B, ldb, beta,
       //                                                                  C, ldc, batchCount, group_size);
       // DEVICE_API_CHECK(event);
@@ -961,7 +974,7 @@ namespace dftfe
           // Assert Statement
         }
         const long* group_size;
-      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::row_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
+      // dftfe::utils::deviceEvent_t event = oneapi::mkl::blas::column_major::gemm_batch(d_streamId, &transa, &transb, m, n, k, alpha,
       //                                                                  A, lda, B, ldb, beta,
       //                                                                  C, ldc, batchCount, group_size);
       // DEVICE_API_CHECK(event);

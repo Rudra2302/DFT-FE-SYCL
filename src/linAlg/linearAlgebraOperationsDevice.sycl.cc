@@ -859,21 +859,9 @@ namespace dftfe
                   // the correct rotationMatBlock for dgemm
                   dftfe::utils::deviceEventRecord(communEvents[blockCount],
                                                   streamDeviceCCL);
-                  // if (dftfe::utils::deviceEventSynchronize(
-                  //       communEvents[blockCount]) ==
-                  //     dftfe::utils::deviceSuccess)
-                  //   rotationMatBlock.swap(rotationMatBlockNext);
-
-                    try{
-                        dftfe::utils::deviceEventSynchronize(communEvents[blockCount]);
-                        rotationMatBlock.swap(rotationMatBlockNext);
-                    }
-                    catch(const dftfe::utils::deviceError_t &e){                  \
-                        std::cerr<<"SYCL error on or before line number"<<        \
-                                     __LINE__ <<" in file: "<<                    \
-                                     __FILE__ <<". Error code: "<<                \
-                                     e.what()<<".\n";                             \
-                    } 
+                  if (dftfe::utils::deviceEventSynchronize(
+                        communEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                    rotationMatBlock.swap(rotationMatBlockNext);
                 }
 
               if (BDof != 0)
@@ -1282,21 +1270,9 @@ namespace dftfe
                       // stream has the correct rotationMatBlock for dgemm
                       dftfe::utils::deviceEventRecord(communEvents[blockCount],
                                                       streamDeviceCCL);
-                      // if (dftfe::utils::deviceEventSynchronize(
-                      //       communEvents[blockCount]) ==
-                      //     dftfe::utils::deviceSuccess)
-                      //   rotationMatBlock.swap(rotationMatBlockTemp);
-                      
-                      try{
-                        dftfe::utils::deviceEventSynchronize(communEvents[blockCount]);
+                      if (dftfe::utils::deviceEventSynchronize(
+                            communEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
                         rotationMatBlock.swap(rotationMatBlockTemp);
-                      }
-                      catch(const dftfe::utils::deviceError_t &e){                  \
-                          std::cerr<<"SYCL error on or before line number"<<        \
-                                      __LINE__ <<" in file: "<<                    \
-                                      __FILE__ <<". Error code: "<<                \
-                                      e.what()<<".\n";                             \
-                      } 
                     }
 
                   if (BDof != 0)
@@ -1669,17 +1645,9 @@ namespace dftfe
                   // the correct rotationMatBlock for dgemm
                   dftfe::utils::deviceEventRecord(communEvents[blockCount],
                                                   streamDeviceCCL);
-                    
-                    try{
-                        dftfe::utils::deviceEventSynchronize(communEvents[blockCount]);
+                    if (dftfe::utils::deviceEventSynchronize(
+                            communEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
                         rotationMatBlockSP.swap(rotationMatBlockSPTemp);
-                    }
-                    catch(const dftfe::utils::deviceError_t &e){                  \
-                        std::cerr<<"SYCL error on or before line number"<<        \
-                                     __LINE__ <<" in file: "<<                    \
-                                     __FILE__ <<". Error code: "<<                \
-                                     e.what()<<".\n";                             \
-                    } 
                 }
 
               for (unsigned int idof = 0; idof < maxNumLocalDofs;
@@ -2060,20 +2028,9 @@ namespace dftfe
                   // the correct rotationMatBlock for dgemm
                   dftfe::utils::deviceEventRecord(communEvents[blockCount],
                                                   streamDeviceCCL);
-                  // if (dftfe::utils::deviceEventSynchronize(
-                  //       communEvents[blockCount]) ==
-                  //     dftfe::utils::deviceSuccess)
-                  //   rotationMatBlockSP.swap(rotationMatBlockSPTemp);
-                  try{
-                    dftfe::utils::deviceEventSynchronize(communEvents[blockCount]);
+                  if (dftfe::utils::deviceEventSynchronize(
+                        communEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
                     rotationMatBlockSP.swap(rotationMatBlockSPTemp);
-                  }
-                  catch(const dftfe::utils::deviceError_t &e){                  \
-                      std::cerr<<"SYCL error on or before line number"<<        \
-                                  __LINE__ <<" in file: "<<                    \
-                                  __FILE__ <<". Error code: "<<                \
-                                  e.what()<<".\n";                             \
-                  } 
                 }
 
               for (unsigned int idof = 0; idof < maxNumLocalDofs;
@@ -2455,22 +2412,10 @@ namespace dftfe
               // both the compute on currentblock and swap is over. Note that at
               // this point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   overlapMatrixBlock.swap(overlapMatrixBlockNext);
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
-                  overlapMatrixBlock.swap(overlapMatrixBlockNext);
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              } 
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
+                overlapMatrixBlock.swap(overlapMatrixBlockNext);
 
               const unsigned int ivecNew = ivec + vectorsBlockSize;
               const unsigned int DNew    = N - ivecNew;
@@ -2542,10 +2487,9 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matri
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-              dftfe::utils::deviceEventSynchronize(copyEvents[blockCount]);
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
                   // Sum local XTrunc^{T}*XcBlock across domain decomposition
                   // processors
                   if (!dftParams.useDeviceDirectAllReduce)
@@ -2578,7 +2522,7 @@ namespace dftfe
                                   overlapMatrixBlockHost[i * D + j - ivec];
                             }
                         }
-                // }
+                }
             } // band parallelization
 
           blockCount += 1;
@@ -3083,28 +3027,13 @@ namespace dftfe
               // both the compute on currentblock and swap is over. Note that at
               // this point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   {
-              //     overlapMatrixBlockDP.swap(overlapMatrixBlockDPNext);
-              //     overlapMatrixBlockSP.swap(overlapMatrixBlockSPNext);
-              //   }
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
                 {
                   overlapMatrixBlockDP.swap(overlapMatrixBlockDPNext);
                   overlapMatrixBlockSP.swap(overlapMatrixBlockSPNext);
                 }
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              }
 
               const unsigned int DRem = D - B;
 
@@ -3216,11 +3145,10 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matri
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-                  dftfe::utils::deviceEventSynchronize(copyEvents[blockCount]);
-                  // const unsigned int DRem = D - B;
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
+                  const unsigned int DRem = D - B;
 
                   if (!dftParams.useDeviceDirectAllReduce)
                     {
@@ -3277,7 +3205,7 @@ namespace dftfe
                                                            B];
                             }
                         }
-                // }
+                }
             } // band parallelization
 
           blockCount += 1;
@@ -3468,22 +3396,10 @@ namespace dftfe
               // both the compute on currentblock and swap is over. Note that at
               // this point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   overlapMatrixBlock.swap(overlapMatrixBlockNext);
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
-                  overlapMatrixBlock.swap(overlapMatrixBlockNext);
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              }
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (ivec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
+                overlapMatrixBlock.swap(overlapMatrixBlockNext);
 
               const unsigned int ivecNew = ivec + vectorsBlockSize;
               const unsigned int DNew    = N - ivecNew;
@@ -3588,11 +3504,9 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matri
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-                  dftfe::utils::deviceEventSynchronize(
-                    copyEvents[blockCount]);
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
                   if (!dftParams.useDeviceDirectAllReduce)
                     {
                       // Sum local XTrunc^{T}*XcBlock for double precision
@@ -3648,7 +3562,7 @@ namespace dftfe
                                                            B];
                             }
                         }
-                // }
+                }
             } // band parallelization
 
           blockCount += 1;
@@ -4183,23 +4097,10 @@ namespace dftfe
               // the compute on currentblock and swap is over. Note that at this
               // point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   projHamBlock.swap(projHamBlockNext);
-              
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
-                  projHamBlock.swap(projHamBlockNext);
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              }
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
+                projHamBlock.swap(projHamBlockNext);
 
               const unsigned int jvecNew = jvec + vectorsBlockSize;
               const unsigned int DNew    = N - jvecNew;
@@ -4295,11 +4196,9 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matrix
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-                  dftfe::utils::deviceEventSynchronize(
-                    copyEvents[blockCount]);
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
                   // Sum local projHamBlock across domain decomposition
                   // processors
                   if (!dftParams.useDeviceDirectAllReduce)
@@ -4330,7 +4229,7 @@ namespace dftfe
                                   projHamBlockHost[j * D + i - jvec];
                             }
                         }
-                // }
+                }
 
             } // band parallelization
           blockCount += 1;
@@ -4641,32 +4540,15 @@ namespace dftfe
               // the compute on currentblock and swap is over. Note that at this
               // point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   {
-              //     if (jvec + B > Noc)
-              //       projHamBlock.swap(projHamBlockNext);
-              //     else
-              //       projHamBlockFP32.swap(projHamBlockFP32Next);
-              //   }
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
                 {
                   if (jvec + B > Noc)
                     projHamBlock.swap(projHamBlockNext);
                   else
                     projHamBlockFP32.swap(projHamBlockFP32Next);
                 }
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              }
 
               const unsigned int jvecNew = jvec + vectorsBlockSize;
               const unsigned int DNew    = N - jvecNew;
@@ -4837,11 +4719,9 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matrix
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-                  dftfe::utils::deviceEventSynchronize(
-                    copyEvents[blockCount]);
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
                   if (jvec + B > Noc)
                     {
                       // Sum local projHamBlock across domain decomposition
@@ -4910,7 +4790,7 @@ namespace dftfe
                                 }
                             }
                     }
-                // }
+                }
             } // band parallelization
           blockCount += 1;
         }
@@ -5157,23 +5037,10 @@ namespace dftfe
               // the compute on currentblock and swap is over. Note that at this
               // point there is nothing queued in the streamDataMove as all
               // previous operations in that stream are over.
-              // if ((dftfe::utils::deviceEventSynchronize(
-              //        computeEvents[blockCount]) ==
-              //      dftfe::utils::deviceSuccess) &&
-              //     (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
-              //   projHamBlock.swap(projHamBlockNext);
-              
-              try{
-                dftfe::utils::deviceEventSynchronize(computeEvents[blockCount]);
-                if(jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId])
-                  projHamBlock.swap(projHamBlockNext);
-              }
-              catch(const dftfe::utils::deviceError_t &e){                  \
-                  std::cerr<<"SYCL error on or before line number"<<        \
-                              __LINE__ <<" in file: "<<                    \
-                              __FILE__ <<". Error code: "<<                \
-                              e.what()<<".\n";                             \
-              }
+              if ((dftfe::utils::deviceEventSynchronize(
+                     computeEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code()) &&
+                  (jvec > bandGroupLowHighPlusOneIndices[2 * bandGroupTaskId]))
+                projHamBlock.swap(projHamBlockNext);
 
               const unsigned int jvecNew = jvec + vectorsBlockSize;
               const unsigned int DNew    = N - jvecNew;
@@ -5303,11 +5170,9 @@ namespace dftfe
               // Check that Device->CPU on the current block has been completed.
               // If completed, perform blocking MPI commmunication on the
               // current block and copy to ScaLAPACK matrix
-              // if (dftfe::utils::deviceEventSynchronize(
-              //       copyEvents[blockCount]) == dftfe::utils::deviceSuccess)
-              //   {
-                  dftfe::utils::deviceEventSynchronize(
-                    copyEvents[blockCount]);
+              if (dftfe::utils::deviceEventSynchronize(
+                    copyEvents[blockCount]).code() == dftfe::utils::deviceSuccess.code())
+                {
                   if (jvec + B > Noc)
                     {
                       // Sum local projHamBlock across domain decomposition
@@ -5376,7 +5241,7 @@ namespace dftfe
                                 }
                             }
                     }
-                // }
+                }
 
             } // band parallelization
           blockCount += 1;

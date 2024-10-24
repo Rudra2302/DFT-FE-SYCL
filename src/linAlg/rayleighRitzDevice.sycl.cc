@@ -518,17 +518,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                    // Add EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   0,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    0,
                                    &error);
                   AssertThrow(error == ELPA_OK,
@@ -546,17 +537,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                    // Add EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   1,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    1,
                                    &error);
                   AssertThrow(error == ELPA_OK,
@@ -991,17 +973,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                    // Add EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   0,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    0,
                                    &error);
                   AssertThrow(error == ELPA_OK,
@@ -1020,17 +993,8 @@ namespace dftfe
               if (dftParams.useELPADeviceKernel)
                 {
 #ifdef DFTFE_WITH_DEVICE_INTEL
-                    // Add EQUIVALENT
-#elif DFTFE_WITH_DEVICE_NVIDIA
                   elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "nvidia-gpu",
-                                   1,
-                                   &error);
-                  AssertThrow(error == ELPA_OK,
-                              dealii::ExcMessage("DFT-FE Error: ELPA Error."));
-#elif DFTFE_WITH_DEVICE_AMD
-                  elpa_set_integer(elpaScala.getElpaHandle(),
-                                   "amd-gpu",
+                                   "intel-gpu",
                                    1,
                                    &error);
                   AssertThrow(error == ELPA_OK,
@@ -1153,7 +1117,8 @@ namespace dftfe
 #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
                     size_t total_workitems = ((BVec + (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
                                                 dftfe::utils::DEVICE_BLOCK_SIZE * M) * dftfe::utils::DEVICE_BLOCK_SIZE;
-                    dftfe::utils::deviceEvent_t event = handle.parallel_for(
+                    dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+                    dftfe::utils::deviceEvent_t event = stream.parallel_for(
                                                 sycl::nd_range<1>(total_workitems,dftfe::utils::DEVICE_BLOCK_SIZE), 
                                                 [=](sycl::nd_item<1> ind){
                         setZeroKernel(ind, BVec, M, N, X, jvec);

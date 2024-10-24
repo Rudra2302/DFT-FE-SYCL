@@ -50,7 +50,7 @@ namespace dftfe
     {
       // deviceError_t err = cudaDeviceReset();
       // DEVICE_API_CHECK(err);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
 
@@ -68,7 +68,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -76,7 +76,7 @@ namespace dftfe
     {
       // deviceError_t err = cudaGetDeviceCount(count);
       // DEVICE_API_CHECK(err);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -84,7 +84,7 @@ namespace dftfe
     {
       // deviceError_t err = cudaGetDevice(deviceId);
       // DEVICE_API_CHECK(err);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -92,7 +92,7 @@ namespace dftfe
     {
       // deviceError_t err = cudaSetDevice(deviceId);
       // DEVICE_API_CHECK(err);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -107,7 +107,7 @@ namespace dftfe
         {
             return e;
         }
-        return {};
+        return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -122,7 +122,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     template <typename ValueType>
@@ -181,7 +181,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -196,7 +196,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -210,7 +210,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -224,7 +224,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -238,7 +238,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
     deviceError_t
     deviceMemcpyH2D(void *dst, const void *src, std::size_t count)
@@ -251,7 +251,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -265,7 +265,7 @@ namespace dftfe
       // dftfe::utils::deviceStream_t queue{sycl::gpu_selector_v};
       // deviceEvent_t event = queue.sycl::_V1::queue::ext_oneapi_memcpy2d(dst, dpitch, src, spitch, width, height);
       // DEVICE_API_CHECK(event);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
 
@@ -280,7 +280,7 @@ namespace dftfe
       // dftfe::utils::deviceStream_t queue{sycl::gpu_selector_v};
       // deviceEvent_t event = queue.sycl::_V1::queue::ext_oneapi_memcpy2d(dst, dpitch, src, spitch, width, height);
       // DEVICE_API_CHECK(event);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -294,7 +294,7 @@ namespace dftfe
       // dftfe::utils::deviceStream_t queue{sycl::gpu_selector_v};
       // deviceEvent_t event = queue.sycl::_V1::queue::ext_oneapi_memcpy2d(dst, dpitch, src, spitch, width, height);
       // DEVICE_API_CHECK(event);
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -307,7 +307,7 @@ namespace dftfe
       catch (const dftfe::utils::deviceError_t &e) {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -323,7 +323,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -339,7 +339,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -355,7 +355,7 @@ namespace dftfe
       {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -380,13 +380,13 @@ namespace dftfe
       //     return err;
       //   }
 
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
     deviceStreamDestroy(deviceStream_t stream)
     {
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -399,19 +399,19 @@ namespace dftfe
       catch (const dftfe::utils::deviceError_t &e) {
           return e;
       }
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
     deviceEventCreate(deviceEvent_t *pEvent)
     {
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
     deviceEventDestroy(deviceEvent_t event)
     {
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -421,14 +421,14 @@ namespace dftfe
       // DEVICE_API_CHECK(err);
       // return err;
 
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
     deviceEventSynchronize(deviceEvent_t event)
     {
       event.wait_and_throw();
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
     deviceError_t
@@ -438,7 +438,7 @@ namespace dftfe
     {
       event.wait_and_throw();
       stream.wait_and_throw();
-      return {};
+      return dftfe::utils::deviceSuccess;
     }
 
   } // namespace utils

@@ -16,7 +16,6 @@ BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::stridedBlockScaleCopy(
   const std::complex<double> *   copyFromVec,
   std::complex<double> *         copyToVecBlock,
   const dftfe::global_size_type *addToVecStartingContiguousBlockIds);
-// for stridedBlockScale
 template void
 BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::stridedBlockScale(
   const dftfe::size_type contiguousBlockSize,
@@ -96,7 +95,6 @@ BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::stridedBlockScale(
   const double           a,
   const double *         s,
   std::complex<float> *  x);
-// for xscal
 template void
 BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::xscal(
   double *               x,
@@ -175,7 +173,6 @@ BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::stridedCopyToBlock(
   std::complex<float> *          copyToVecBlock,
   const dftfe::global_size_type *copyFromVecStartingContiguousBlockIds);
 
-// strided copy from block
 template void
 BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::stridedCopyFromBlock(
   const dftfe::size_type         contiguousBlockSize,
@@ -286,7 +283,6 @@ BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::
                                    const dftfe::size_type      startingId,
                                    const std::complex<double> *copyFromVec,
                                    std::complex<double> *      copyToVec);
-// axpyStridedBlockAtomicAdd
 template void
 BLASWrapper<dftfe::utils::MemorySpace::DEVICE>::axpyStridedBlockAtomicAdd(
   const dftfe::size_type         contiguousBlockSize,

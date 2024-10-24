@@ -30,15 +30,15 @@
     }                                                             \
 }
 
-#define DEVICEBLAS_API_CHECK(event)                               \
-{                                                                 \
-    event.wait();                                                 \
-    if(event.get_info<dftfe::utils::deviceBlasStatus_t>()         \
-                != dftfe::utils::deviceSuccess){                  \
-        std::cerr<<"SYCL error on or before line number"<<        \
-                     __LINE__ <<" in file: "<<                    \
-                     __FILE__ <<".\n";                            \ 
-    }                                                             \
+#define DEVICEBLAS_API_CHECK(event)                                          \
+{                                                                            \
+    event.wait();                                                            \
+    if(event.get_info<sycl::info::event::command_execution_status>()         \
+                != dftfe::utils::deviceBlasSuccess){                         \
+        std::cerr<<"SYCL error on or before line number"<<                   \
+                     __LINE__ <<" in file: "<<                               \
+                     __FILE__ <<".\n";                                       \ 
+    }                                                                        \
 }
 
 #endif // dftfeDeviceExceptions_syclh

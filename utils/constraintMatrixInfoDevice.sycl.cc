@@ -628,31 +628,34 @@ namespace dftfe
     template <typename NumberType>
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::distribute(
-      distributedDeviceVec<NumberType> &fieldVector) const
+      distributedDeviceVec<NumberType> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize = fieldVector.numVectors();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * d_numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(sycl::nd_range<1>(total_workitems,
-//                              dftfe::utils::DEVICE_BLOCK_SIZE), [=](sycl::nd_item<1> ind){
-//             distributeKernel(ind,
-//                              blockSize,
-//                              fieldVector.begin(),
-//                              d_rowIdsLocalDevice.begin(),
-//                              d_numConstrainedDofs,
-//                              d_rowSizesDevice.begin(),
-//                              d_rowSizesAccumulatedDevice.begin(),
-//                              d_columnIdsLocalDevice.begin(),
-//                              d_columnValuesDevice.begin(),
-//                              d_inhomogenitiesDevice.begin());
-//         });
-//         event.wait();
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t workitems = ((blockSize * d_numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        size_t max_workitems = 30000 * dftfe::utils::DEVICE_BLOCK_SIZE;
+        size_t total_workitems = std::min(workitems, max_workitems);
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(sycl::nd_range<1>(total_workitems,
+                             dftfe::utils::DEVICE_BLOCK_SIZE), [=](sycl::nd_item<1> ind){
+            distributeKernel(ind,
+                             blockSize,
+                             fieldVector.begin(),
+                             d_rowIdsLocalDevice.begin(),
+                             d_numConstrainedDofs,
+                             d_rowSizesDevice.begin(),
+                             d_rowSizesAccumulatedDevice.begin(),
+                             d_columnIdsLocalDevice.begin(),
+                             d_columnValuesDevice.begin(),
+                             d_inhomogenitiesDevice.begin());
+        });
+        event.wait();
+#endif
     }
 
 
@@ -665,25 +668,26 @@ namespace dftfe
     {
       if (d_numConstrainedDofs == 0)
         return;
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((d_numConstrainedDofs +
-//                                     (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                      dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                 sycl::nd_range<1>(total_workitems,
-//                                                 dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                 [=](sycl::nd_item<1> ind){
-//             scaleConstraintsKernel( ind,
-//                                     invSqrtMassVec.data(),
-//                                     d_rowIdsLocalDevice.begin(),
-//                                     d_numConstrainedDofs,
-//                                     d_rowSizesDevice.begin(),
-//                                     d_rowSizesAccumulatedDevice.begin(),
-//                                     d_columnIdsLocalDevice.begin(),
-//                                     d_columnValuesDevice.begin());
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((d_numConstrainedDofs +
+                                    (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                     dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                sycl::nd_range<1>(total_workitems,
+                                                dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                [=](sycl::nd_item<1> ind){
+            scaleConstraintsKernel( ind,
+                                    invSqrtMassVec.data(),
+                                    d_rowIdsLocalDevice.begin(),
+                                    d_numConstrainedDofs,
+                                    d_rowSizesDevice.begin(),
+                                    d_rowSizesAccumulatedDevice.begin(),
+                                    d_columnIdsLocalDevice.begin(),
+                                    d_columnValuesDevice.begin());
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
     //
     // set the constrained degrees of freedom to values so that constraints
@@ -692,155 +696,160 @@ namespace dftfe
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::
       distribute_slave_to_master(
-        distributedDeviceVec<double> &fieldVector) const
+        distributedDeviceVec<double> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize = fieldVector.numVectors();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * d_numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                   sycl::nd_range<1>(total_workitems,
-//                                                   dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                   [=](sycl::nd_item<1> ind){
-//             distributeSlaveToMasterKernelAtomicAdd( ind,
-//                                                     blockSize,
-//                                                     fieldVector.begin(),
-//                                                     d_rowIdsLocalDevice.begin(),
-//                                                     d_numConstrainedDofs,
-//                                                     d_rowSizesDevice.begin(),
-//                                                     d_rowSizesAccumulatedDevice.begin(),
-//                                                     d_columnIdsLocalDevice.begin(),
-//                                                     d_columnValuesDevice.begin());
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((blockSize * d_numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                  sycl::nd_range<1>(total_workitems,
+                                                  dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                  [=](sycl::nd_item<1> ind){
+            distributeSlaveToMasterKernelAtomicAdd( ind,
+                                                    blockSize,
+                                                    fieldVector.begin(),
+                                                    d_rowIdsLocalDevice.begin(),
+                                                    d_numConstrainedDofs,
+                                                    d_rowSizesDevice.begin(),
+                                                    d_rowSizesAccumulatedDevice.begin(),
+                                                    d_columnIdsLocalDevice.begin(),
+                                                    d_columnValuesDevice.begin());
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
 
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::
       distribute_slave_to_master(
-        distributedDeviceVec<float> &fieldVector) const
+        distributedDeviceVec<float> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize = fieldVector.numVectors();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * d_numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                   sycl::nd_range<1>(total_workitems,
-//                                                   dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                   [=](sycl::nd_item<1> ind){
-//             distributeSlaveToMasterKernelAtomicAdd( ind,
-//                                                     blockSize,
-//                                                     fieldVector.begin(),
-//                                                     d_rowIdsLocalDevice.begin(),
-//                                                     d_numConstrainedDofs,
-//                                                     d_rowSizesDevice.begin(),
-//                                                     d_rowSizesAccumulatedDevice.begin(),
-//                                                     d_columnIdsLocalDevice.begin(),
-//                                                     d_columnValuesDevice.begin());
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((blockSize * d_numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                  sycl::nd_range<1>(total_workitems,
+                                                  dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                  [=](sycl::nd_item<1> ind){
+            distributeSlaveToMasterKernelAtomicAdd( ind,
+                                                    blockSize,
+                                                    fieldVector.begin(),
+                                                    d_rowIdsLocalDevice.begin(),
+                                                    d_numConstrainedDofs,
+                                                    d_rowSizesDevice.begin(),
+                                                    d_rowSizesAccumulatedDevice.begin(),
+                                                    d_columnIdsLocalDevice.begin(),
+                                                    d_columnValuesDevice.begin());
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
 
 
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::
       distribute_slave_to_master(
-        distributedDeviceVec<std::complex<double>> &fieldVector) const
+        distributedDeviceVec<std::complex<double>> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize = fieldVector.numVectors();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * d_numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                 sycl::nd_range<1>(total_workitems,
-//                                                 dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                 [=](sycl::nd_item<1> ind){
-//             distributeSlaveToMasterKernelAtomicAdd( ind,
-//                                                     blockSize,
-//                                                     fieldVector.begin(),
-//                                                     d_rowIdsLocalDevice.begin(),
-//                                                     d_numConstrainedDofs,
-//                                                     d_rowSizesDevice.begin(),
-//                                                     d_rowSizesAccumulatedDevice.begin(),
-//                                                     d_columnIdsLocalDevice.begin(),
-//                                                     d_columnValuesDevice.begin());
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((blockSize * d_numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                sycl::nd_range<1>(total_workitems,
+                                                dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                [=](sycl::nd_item<1> ind){
+            distributeSlaveToMasterKernelAtomicAdd( ind,
+                                                    blockSize,
+                                                    fieldVector.begin(),
+                                                    d_rowIdsLocalDevice.begin(),
+                                                    d_numConstrainedDofs,
+                                                    d_rowSizesDevice.begin(),
+                                                    d_rowSizesAccumulatedDevice.begin(),
+                                                    d_columnIdsLocalDevice.begin(),
+                                                    d_columnValuesDevice.begin());
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
 
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::
       distribute_slave_to_master(
-        distributedDeviceVec<std::complex<float>> &fieldVector) const
+        distributedDeviceVec<std::complex<float>> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize = fieldVector.numVectors();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * d_numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                 sycl::nd_range<1>(total_workitems,
-//                                                 dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                 [=](sycl::nd_item<1> ind){
-//             distributeSlaveToMasterKernelAtomicAdd( ind,
-//                                                     blockSize,
-//                                                     fieldVector.begin(),
-//                                                     d_rowIdsLocalDevice.begin(),
-//                                                     d_numConstrainedDofs,
-//                                                     d_rowSizesDevice.begin(),
-//                                                     d_rowSizesAccumulatedDevice.begin(),
-//                                                     d_columnIdsLocalDevice.begin(),
-//                                                     d_columnValuesDevice.begin());
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((blockSize * d_numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                sycl::nd_range<1>(total_workitems,
+                                                dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                [=](sycl::nd_item<1> ind){
+            distributeSlaveToMasterKernelAtomicAdd( ind,
+                                                    blockSize,
+                                                    fieldVector.begin(),
+                                                    d_rowIdsLocalDevice.begin(),
+                                                    d_numConstrainedDofs,
+                                                    d_rowSizesDevice.begin(),
+                                                    d_rowSizesAccumulatedDevice.begin(),
+                                                    d_columnIdsLocalDevice.begin(),
+                                                    d_columnValuesDevice.begin());
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
 
 
     template <typename NumberType>
     void
     constraintMatrixInfo<dftfe::utils::MemorySpace::DEVICE>::set_zero(
-      distributedDeviceVec<NumberType> &fieldVector) const
+      distributedDeviceVec<NumberType> &fieldVector)
     {
       if (d_numConstrainedDofs == 0)
         return;
 
       const unsigned int blockSize          = fieldVector.numVectors();
       const unsigned int numConstrainedDofs = d_rowIdsLocal.size();
-// #ifdef DFTFE_WITH_DEVICE_LANG_SYCL
-//         size_t total_workitems = ((blockSize * numConstrainedDofs +
-//                                         (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
-//                                         dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
-//         dftfe::utils::deviceEvent_t event = dftfe::utils::deviceBlasWrapper::d_streamId.parallel_for(
-//                                                 sycl::nd_range<1>(total_workitems,
-//                                                 dftfe::utils::DEVICE_BLOCK_SIZE), 
-//                                                 [=](sycl::nd_item<1> ind){
-//             setzeroKernel(ind,
-//                           blockSize,
-//                           fieldVector.begin(),
-//                           d_rowIdsLocalDevice.begin(),
-//                           numConstrainedDofs);
-//         });
-//         DEVICE_API_CHECK(event);
-// #endif
+#ifdef DFTFE_WITH_DEVICE_LANG_SYCL
+        size_t total_workitems = ((blockSize * numConstrainedDofs +
+                                        (dftfe::utils::DEVICE_BLOCK_SIZE - 1)) /
+                                        dftfe::utils::DEVICE_BLOCK_SIZE) * dftfe::utils::DEVICE_BLOCK_SIZE;
+        dftfe::utils::deviceStream_t stream{sycl::gpu_selector_v};
+        dftfe::utils::deviceEvent_t event = stream.parallel_for(
+                                                sycl::nd_range<1>(total_workitems,
+                                                dftfe::utils::DEVICE_BLOCK_SIZE), 
+                                                [=](sycl::nd_item<1> ind){
+            setzeroKernel(ind,
+                          blockSize,
+                          fieldVector.begin(),
+                          d_rowIdsLocalDevice.begin(),
+                          numConstrainedDofs);
+        });
+        DEVICE_API_CHECK(event);
+#endif
     }
 
     //
